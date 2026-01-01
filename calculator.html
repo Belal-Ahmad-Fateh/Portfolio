@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ماشین حساب هوشمند</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #00bcd4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a237e;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .display {
+            background: #f5f5f5;
+            border: 2px solid #00bcd4;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: right;
+            font-size: 2rem;
+            word-wrap: break-word;
+            word-break: break-all;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            color: #1a237e;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .number, .operator {
+            background: #f5f5f5;
+            color: #1a237e;
+            border: 2px solid #e0e0e0;
+        }
+
+        .number:hover, .operator:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .operator {
+            background: #00bcd4;
+            color: white;
+            border-color: #00bcd4;
+        }
+
+        .operator:hover {
+            background: #0097a7;
+        }
+
+        .equals {
+            grid-column: span 2;
+            background: #1a237e;
+            color: white;
+            border-color: #1a237e;
+        }
+
+        .equals:hover {
+            background: #0d1b5e;
+        }
+
+        .clear {
+            grid-column: span 2;
+            background: #ff5252;
+            color: white;
+            border-color: #ff5252;
+        }
+
+        .clear:hover {
+            background: #ff1744;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #00bcd4;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #1a237e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 ماشین حساب</h1>
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">پاک کردن</button>
+            <button class="operator" onclick="appendOperator('/')">÷</button>
+            <button class="operator" onclick="appendOperator('*')">×</button>
+            
+            <button class="number" onclick="appendNumber('7')">7</button>
+            <button class="number" onclick="appendNumber('8')">8</button>
+            <button class="number" onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="appendOperator('-')">−</button>
+            
+            <button class="number" onclick="appendNumber('4')">4</button>
+            <button class="number" onclick="appendNumber('5')">5</button>
+            <button class="number" onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="appendOperator('+')">+</button>
+            
+            <button class="number" onclick="appendNumber('1')">1</button>
+            <button class="number" onclick="appendNumber('2')">2</button>
+            <button class="number" onclick="appendNumber('3')">3</button>
+            <button class="operator" onclick="appendOperator('%')">%</button>
+            
+            <button class="number" onclick="appendNumber('0')">0</button>
+            <button class="number" onclick="appendNumber('.')">.</button>
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+        <a href="../index.html#projects" class="back-link">← بازگشت به پورتفولیو</a>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentValue = '0';
+        let previousValue = '';
+        let operator = '';
+
+        function appendNumber(num) {
+            if (currentValue === '0' && num !== '.') {
+                currentValue = num;
+            } else if (num === '.' && currentValue.includes('.')) {
+                return;
+            } else {
+                currentValue += num;
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (currentValue === '') return;
+            
+            if (previousValue !== '') {
+                calculate();
+            }
+            
+            operator = op;
+            previousValue = currentValue;
+            currentValue = '';
+        }
+
+        function calculate() {
+            if (previousValue === '' || currentValue === '' || operator === '') return;
+            
+            let result;
+            const prev = parseFloat(previousValue);
+            const current = parseFloat(currentValue);
+            
+            switch(operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    result = current !== 0 ? prev / current : 'خطا';
+                    break;
+                case '%':
+                    result = prev % current;
+                    break;
+                default:
+                    return;
+            }
+            
+            currentValue = result.toString();
+            operator = '';
+            previousValue = '';
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentValue = '0';
+            previousValue = '';
+            operator = '';
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            display.textContent = currentValue || '0';
+        }
+    </script>
+</body>
+</html>

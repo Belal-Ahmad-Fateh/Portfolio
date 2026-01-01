@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>یادداشت‌برداری آنلاین</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #00bcd4 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00bcd4;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: #00bcd4;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: #0097a7;
+            transform: translateY(-2px);
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .note-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .note-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .note-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1a237e;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+
+        .note-content {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            flex: 1;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .note-date {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .note-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .edit-btn {
+            background: #2196f3;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #1976d2;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #da190b;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: white;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: #1a237e;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1a237e;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00bcd4;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        .cancel-btn {
+            background: #e0e0e0;
+            color: #1a237e;
+        }
+
+        .cancel-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 یادداشت‌های من</h1>
+        
+        <div class="controls">
+            <div class="input-group">
+                <input type="text" id="searchInput" placeholder="جستجو در یادداشت‌ها..." onkeyup="filterNotes()">
+            </div>
+            <button onclick="openNewNoteModal()">+ یادداشت جدید</button>
+            <button onclick="downloadNotes()">⬇️ دانلود</button>
+        </div>
+
+        <div class="notes-grid" id="notesGrid"></div>
+        <div class="empty-message" id="emptyMessage">هنوز یادداشتی وجود ندارد. یادداشت جدید اضافه کنید!</div>
+
+        <!-- Modal -->
+        <div class="modal" id="noteModal">
+            <div class="modal-content">
+                <h2 class="modal-title" id="modalTitle">یادداشت جدید</h2>
+                <form onsubmit="saveNote(event)">
+                    <div class="form-group">
+                        <label for="noteTitle">عنوان</label>
+                        <input type="text" id="noteTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="noteContent">محتوا</label>
+                        <textarea id="noteContent" required></textarea>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="cancel-btn" onclick="closeModal()">انصراف</button>
+                        <button type="submit" style="background: #00bcd4;">ذخیره</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <a href="../index.html#projects" class="back-link">← بازگشت به پورتفولیو</a>
+    </div>
+
+    <script>
+        let notes = [];
+        let editingIndex = -1;
+
+        // Load notes from localStorage
+        function loadNotes() {
+            const saved = localStorage.getItem('notes');
+            notes = saved ? JSON.parse(saved) : [];
+            renderNotes();
+        }
+
+        // Save notes to localStorage
+        function saveNotesToStorage() {
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        // Render notes
+        function renderNotes() {
+            const grid = document.getElementById('notesGrid');
+            const empty = document.getElementById('emptyMessage');
+            grid.innerHTML = '';
+
+            if (notes.length === 0) {
+                empty.style.display = 'block';
+            } else {
+                empty.style.display = 'none';
+                notes.forEach((note, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'note-card';
+                    card.innerHTML = `
+                        <div class="note-title">${escapeHtml(note.title)}</div>
+                        <div class="note-content">${escapeHtml(note.content)}</div>
+                        <div class="note-date">${new Date(note.date).toLocaleDateString('fa-IR')}</div>
+                        <div class="note-actions">
+                            <button class="note-btn edit-btn" onclick="editNote(${index})">ویرایش</button>
+                            <button class="note-btn delete-btn" onclick="deleteNote(${index})">حذف</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // Open new note modal
+        function openNewNoteModal() {
+            editingIndex = -1;
+            document.getElementById('modalTitle').textContent = 'یادداشت جدید';
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            document.getElementById('noteModal').classList.add('active');
+        }
+
+        // Edit note
+        function editNote(index) {
+            editingIndex = index;
+            document.getElementById('modalTitle').textContent = 'ویرایش یادداشت';
+            document.getElementById('noteTitle').value = notes[index].title;
+            document.getElementById('noteContent').value = notes[index].content;
+            document.getElementById('noteModal').classList.add('active');
+        }
+
+        // Save note
+        function saveNote(e) {
+            e.preventDefault();
+            const title = document.getElementById('noteTitle').value;
+            const content = document.getElementById('noteContent').value;
+
+            if (editingIndex === -1) {
+                notes.push({ title, content, date: new Date() });
+            } else {
+                notes[editingIndex] = { title, content, date: notes[editingIndex].date };
+            }
+
+            saveNotesToStorage();
+            renderNotes();
+            closeModal();
+        }
+
+        // Delete note
+        function deleteNote(index) {
+            if (confirm('آیا مطمئن هستید؟')) {
+                notes.splice(index, 1);
+                saveNotesToStorage();
+                renderNotes();
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('noteModal').classList.remove('active');
+        }
+
+        // Filter notes
+        function filterNotes() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.note-card');
+            cards.forEach(card => {
+                const title = card.querySelector('.note-title').textContent.toLowerCase();
+                const content = card.querySelector('.note-content').textContent.toLowerCase();
+                card.style.display = (title.includes(search) || content.includes(search)) ? 'flex' : 'none';
+            });
+        }
+
+        // Download notes
+        function downloadNotes() {
+            const content = notes.map(n => `${n.title}\n${n.content}\n---\n`).join('\n');
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+            element.setAttribute('download', 'notes.txt');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Close modal on outside click
+        document.getElementById('noteModal').addEventListener('click', (e) => {
+            if (e.target.id === 'noteModal') closeModal();
+        });
+
+        // Initial load
+        loadNotes();
+    </script>
+</body>
+</html>
